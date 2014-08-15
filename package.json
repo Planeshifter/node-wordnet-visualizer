@@ -1,0 +1,36 @@
+{
+  "name": "wordnet-visualizer",
+  "version": "0.0.0",
+  "description": "visualization of WordNet objects as created by the wordnet-magic package",
+  "main": "src/index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Planeshifter/node-wordnet-visualizer.git"
+  },
+  "keywords": [
+    "wordnet",
+    "visualization",
+    "d3",
+    "semantic-web"
+  ],
+  "author": "Philipp Burckhardt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Planeshifter/node-wordnet-visualizer/issues"
+  },
+  "dependencies": {
+    "d3": "~3.4.11",
+    "wordnet-magic": "0.0.2",
+    "underscore": "~1.6.0",
+    "underscore.string": "~2.3.3",
+    "bluebird": "~2.3.0",
+    "text-miner": "0.0.0"
+  }
+}
