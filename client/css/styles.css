@@ -1,0 +1,41 @@
+@font-face {
+    font-family:'Open Sans', Sans-Serif;
+    src: url('http://fonts.googleapis.com/css?family=Open+Sans:300');
+}
+
+body {
+	font-family:'Open Sans', Sans-Serif;
+	overflow-y: scroll;
+}
+
+.node text{
+	font-size: 12px;
+	font-family: Arial, Helvetica, sans-serif;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+}
+
+#sentence_form{
+	position: fixed;
+	width: 25%;
+	border-radius: 4px;
+}
+
+textarea{
+	display:block;
+	margin-left: auto;
+	margin-right: auto;
+	position:relative;
+	resize: none;
+	width: 97%;
+}
+
+#clear {
+	float: left;
+}
+
+#analyze {
+	float: right;
+}
+

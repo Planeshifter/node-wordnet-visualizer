@@ -2,7 +2,7 @@
   "name": "wordnet-visualizer",
   "version": "0.0.0",
   "description": "visualization of WordNet objects as created by the wordnet-magic package",
-  "main": "src/index.js",
+  "main": "server/index.js",
   "directories": {
     "example": "examples",
     "test": "test"
