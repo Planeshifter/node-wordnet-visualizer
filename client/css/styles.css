@@ -20,6 +20,8 @@ body {
 	position: fixed;
 	width: 25%;
 	border-radius: 4px;
+  background-color: gainsboro;
+  z-index: 10;
 }
 
 textarea{
@@ -29,6 +31,16 @@ textarea{
 	position:relative;
 	resize: none;
 	width: 97%;
+}
+
+legend{
+  background-color: gainsboro;
+  padding: 4px;
+  border-left: 1px solid darkgrey;
+  border-right: 1px solid darkgrey;
+  border-top: 1px solid darkgrey;
+  border-bottom: 1px solid darkgrey;
+  color: rgb(32,32,32);
 }
 
 #clear {

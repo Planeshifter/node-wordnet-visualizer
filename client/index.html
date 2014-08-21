@@ -259,7 +259,7 @@ var chart = tree();
 function paintSentenceGraph() {
 	
 	query = encodeURIComponent($("#input_text").val());
-	url = "http://127.0.0.1:12000/analyze_sentence?" + query;
+	url = "http://philipp-burckhardt.com:12000/analyze_sentence?" + query;
 	
 	if(query !== ""){
 		$.ajax({
