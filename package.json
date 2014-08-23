@@ -27,10 +27,11 @@
   },
   "dependencies": {
     "d3": "~3.4.11",
-    "wordnet-magic": "0.0.2",
+    "wordnet-magic": "0.1.0",
     "underscore": "~1.6.0",
     "underscore.string": "~2.3.3",
     "bluebird": "~2.3.0",
-    "text-miner": "0.0.0"
+    "text-miner": "0.0.0",
+    "traceur": "0.0.58"
   }
 }

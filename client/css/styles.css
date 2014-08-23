@@ -9,7 +9,7 @@ body {
 }
 
 .node text{
-	font-size: 12px;
+	font-size: 10px;
 	font-family: Arial, Helvetica, sans-serif;
 	-webkit-transform: rotate(45deg);
 	-moz-transform: rotate(45deg);
@@ -20,8 +20,13 @@ body {
 	position: fixed;
 	width: 25%;
 	border-radius: 4px;
-  background-color: gainsboro;
-  z-index: 10;
+	background-color: gainsboro;
+  	z-index: 10;
+  	opacity: 0.1;
+}
+
+#sentence_form:hover{
+	opacity: 1;	
 }
 
 textarea{
@@ -45,6 +50,10 @@ legend{
 
 #clear {
 	float: left;
+}
+
+#text{
+	float: right;
 }
 
 #analyze {

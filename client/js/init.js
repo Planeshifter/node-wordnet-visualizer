@@ -22,12 +22,7 @@ function tree() {
             _svg = d3.select("body").append("svg")
                     .attr("height", _height)
                     .attr("width", _width)
-                    .attr("id", "graph")
-                    .call( // <-A
-						d3.behavior.zoom() // <-B
-						.scaleExtent([1, 10]) // <-C
-						.on("zoom", zoom) // <-D
-					);
+                    .attr("id", "graph");
                     						
         }
 
@@ -41,7 +36,11 @@ function tree() {
 				.attr("transform", function (d) {
 					return "translate(" + _margins.left 
 						+ "," + _margins.top + ")";
-				});
+				}).call( // <-A
+                        d3.behavior.zoom() // <-B
+                        .scaleExtent([1, 8]) // <-C
+                        .on("zoom", zoom) // <-D
+                );
         }
 
         _tree = d3.layout.tree()
@@ -143,7 +142,7 @@ function tree() {
                 })
                 .text(function (d) {
                 	console.log(d.words)
-                    var words =  d.words.map(function(e){ return e.lemma; });
+                    var words =  d.words.slice(0, 3).map(function(e){ return e.lemma; });
                     return words.join(", ");
                 })
                 .style("fill-opacity", 1e-6);
@@ -225,37 +224,125 @@ function tree() {
 
 var chart = tree();
 
-function paintSentenceGraph() {
+paintSentenceGraph.last_query = "";
+
+function paintSentenceGraph(type) {
 	
 	query = encodeURIComponent($("#input_text").val());
-	url = "http://127.0.0.1:12000/analyze_sentence?" + query;
-	
-	if(query !== ""){
-		$.ajax({
-			type : "GET",
-			url : url
-		}).done(function(msg) {
-			if (msg.length > 1) {
-		      var root = {};
-		      root.words = [{lemma: "root"}];
-		      root.lexdomain = "NA";
-		      root.definition = "NA";
-		      root.pos = "NA";
-		      root.children = msg;
-		      chart.nodes(root).render();
-			} else {
-			  chart.nodes(msg[0]).render();	
-			}
-		});
-	}
+
+    if(query !== ""){
+      if(query !== paintSentenceGraph.last_query){
+      url = "http://127.0.0.1:12000/analyze_sentence?" + query;
+
+        $.ajax({
+            type : "GET",
+            url : url
+        }).done(function(msg) {
+            var root = {}
+            if (msg.length > 1) {
+              root.words = [{lemma: "root"}];
+              root.lexdomain = "NA";
+              root.definition = "NA";
+              root.pos = "NA";
+              root.children = msg;
+            } else {
+              root = msg[0];
+            }
+
+            paintSentenceGraph.data = root;
+
+            switch(type){
+              case "text":              
+                renderText(paintSentenceGraph.data);
+              break; 
+              case "graph":   
+                chart.nodes(root).render();
+              break;
+            }
+
+            paintSentenceGraph.last_query  = query;
+        });
+      } else {
+           switch(type){
+              case "text":              
+              console.log(paintSentenceGraph.data)
+                renderText(paintSentenceGraph.data);
+              break; 
+              case "graph":   
+                chart.nodes(paintSentenceGraph.data).render();
+              break;
+            }
+
+      }
+    }
 
 }
 
 function clearSentence(){
 	$("#input_text").val("");
 	d3.select("#graph").remove();
+    d3.select("#dendogram").remove();
 	chart = tree();
 }
+
+function renderText(input){
+
+var countLeafElements = (function (){
+  var counter = 0;
+  return function(obj){ 
+    if (obj.children && obj.children.length > 0){
+      obj.children.forEach(countLeafElements);
+    } else {
+      counter += 1;
+    }
+    return counter;  
+  }
+}());
+
+var numberOfLeafs = countLeafElements(input);
+
+var width = window.innerWidth,
+    height = numberOfLeafs *  15;
+
+var cluster = d3.layout.cluster()
+    .size([height, width - 160]);
+
+var diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("id","dendogram")
+    .append("g")
+    .attr("transform", "translate(40,0)");
+
+  var nodes = cluster.nodes(input),
+      links = cluster.links(nodes);
+
+  var link = svg.selectAll(".link")
+      .data(links)
+    .enter().append("path")
+      .attr("id",function(d){ return d.synsetid })
+      .attr("class", "link")
+      .attr("d", diagonal);
+
+  var node = svg.selectAll(".node")
+      .data(nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+
+  node.append("text")
+      .attr("dx", function(d) { return d.children ? -8 : 8; })
+      .attr("dy", 3)
+      .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+      .style("-webkit-transform","rotate(0deg)")
+      .text(function(d) { return d.words[0].lemma; });
+
+  return svg;
+}
+
 
 $(function() {
   $( document ).tooltip({
@@ -263,4 +350,19 @@ $(function() {
         return $(this).attr('title');
     }
   });
+  $("#analyze").on("click", function(){
+    d3.select("#dendogram").remove();
+    d3.select("#graph").remove();
+    chart = tree();
+    paintSentenceGraph("graph");  
+  });
+  $("#text").on("click", function(){
+    d3.select("#dendogram").remove();
+    d3.select("#graph").remove();
+    chart = tree();
+    paintSentenceGraph("text");
+  });
+  $("#clear").on("click", function(){
+    clearSentence();
+  })
 });

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tree</title>
+    <title>WordNet Visualizer</title>
     <link rel="stylesheet" type="text/css" href="css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
     
@@ -26,15 +26,15 @@
 
 <fieldset id="sentence_form">
 	<legend>Please enter a sentence:</legend>
-	<textarea id="input_text" rows=3> </textarea>
-	<button id="clear" onclick="clearSentence()">Clear</button>
-	<button id="analyze" onclick="paintSentenceGraph()">Analyze</button>	
+	<textarea id="input_text" rows=3></textarea>
+	<button id="clear">Clear</button>
+	<button id="analyze">Paint Tree</button>	
+    <button id="text">Print Text</button> 
 </fieldset>
 
-
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<script src="js/d3.min.js" charset="utf-8"></script>
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
 <script src="js/init.js"></script>
 </body>
 
