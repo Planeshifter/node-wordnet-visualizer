@@ -8,8 +8,9 @@ function tree() {
             _i = 0,
             _tree,
             _diagonal,
-            _bodyG;
-            
+            _bodyG,
+            _ramp;
+ 
    function zoom() {
 	 _svg.attr("transform", "translate("
      + d3.event.translate
@@ -92,13 +93,15 @@ function tree() {
         nodeEnter.append("svg:circle")
                 .attr("r", 1e-6)
                 .style("fill", function (d) {
-                    return d._children ? "lightsteelblue" : "#fff";
+                    return _ramp(d.counter);  
                 })
                 .attr("title",function(d){
                 	var str = "Definition: " + d.definition + "<br\>";
                 	str += "POS: " + d.pos;
                 	str += "<br\>";
                 	str += "Lexical Domain: " + d.lexdomain;
+                  str += "<br\>";
+                  str += "Counter: " + d.counter;
                 	return str;
                 });
 
@@ -110,7 +113,8 @@ function tree() {
         nodeUpdate.select("circle")
                 .attr("r", 4.5)
                 .style("fill", function (d) {
-                    return d._children ? "lightsteelblue" : "#fff";
+                  console.log(_ramp(d.counter))
+                  return _ramp(d.counter); 
                 });
 
         var nodeExit = node.exit().transition()
@@ -214,8 +218,23 @@ function tree() {
     };
 
     _chart.nodes = function (n) {
-        if (!arguments.length) return _nodes;
+        if (!arguments.length) return _nodes;  
         _nodes = n;
+
+        var counterArray = [];
+        function getMax(arr){
+          arr.forEach(function(d){
+            counterArray.push(d.counter);
+            getMax(d.children)
+          });
+        }
+        getMax(_nodes.children);
+        var maxCounter = counterArray.reduce(function(a, b){ 
+          return a > b ? a : b
+        });
+
+        _ramp = d3.scale.linear().domain([0, maxCounter]).range(["blue","red"])
+
         return _chart;
     };
     
