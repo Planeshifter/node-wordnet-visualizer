@@ -32,6 +32,9 @@
     "underscore.string": "~2.3.3",
     "bluebird": "~2.3.0",
     "text-miner": "0.0.0",
-    "traceur": "0.0.58"
+    "traceur": "0.0.58",
+    "ndarray": "~1.0.15",
+    "ndarray-ops": "~1.2.2",
+    "ndarray-unpack": "~1.0.0"
   }
 }

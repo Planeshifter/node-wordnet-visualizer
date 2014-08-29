@@ -8,8 +8,7 @@ function tree() {
             _i = 0,
             _tree,
             _diagonal,
-            _bodyG,
-            _ramp;
+            _bodyG;
  
    function zoom() {
 	 _svg.attr("transform", "translate("
@@ -90,11 +89,14 @@ function tree() {
                     render(d);
                 });
 
+    var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+
         nodeEnter.append("svg:circle")
                 .attr("r", 1e-6)
-                .style("fill", function (d) {
-                    return _ramp(d.counter);  
-                })
+                .attr("class","synsetNode")
+                .style("fill", "steelblue")
                 .attr("title",function(d){
                 	var str = "Definition: " + d.definition + "<br\>";
                 	str += "POS: " + d.pos;
@@ -102,8 +104,30 @@ function tree() {
                 	str += "Lexical Domain: " + d.lexdomain;
                   str += "<br\>";
                   str += "Counter: " + d.counter;
-                	return str;
+                	return str; })
+                .on("mouseover", function(d) {
+
+                  var str = "<strong>Definition:</strong> " + d.definition + "<br\>";
+                  str += "<strong>POS</strong>: " + d.pos;
+                  str += "<br\>";
+                  str += "<strong>Lexical Domain:</strong> " + d.lexdomain;
+                  str += "<br\>";
+                  str += "<strong>Count:</strong> " + d.counter;
+    
+                    div.transition()        
+                       .duration(200)      
+                       .style("opacity", .9);      
+                    div.html(str)  
+                       .style("left", (d3.event.pageX) + "px")     
+                       .style("top", (d3.event.pageY - 100) + "px");    
+                  })                  
+                .on("mouseout", function(d) {       
+                    div.transition()        
+                        .duration(500)      
+                        .style("opacity", 0);   
                 });
+
+
 
         var nodeUpdate = node.transition()
                 .attr("transform", function (d) {
@@ -112,10 +136,7 @@ function tree() {
 
         nodeUpdate.select("circle")
                 .attr("r", 4.5)
-                .style("fill", function (d) {
-                  console.log(_ramp(d.counter))
-                  return _ramp(d.counter); 
-                });
+                .style("fill", "steelblue");
 
         var nodeExit = node.exit().transition()
                 .attr("transform", function (d) {
@@ -161,6 +182,7 @@ function tree() {
     function renderLinks(nodes, source) {
         var link = _bodyG.selectAll("path.link")
                 .data(_tree.links(nodes), function (d) {
+                  console.log(d.target.id)
                     return d.target.id;
                 });
 
@@ -222,21 +244,6 @@ function tree() {
     _chart.nodes = function (n) {
         if (!arguments.length) return _nodes;  
         _nodes = n;
-
-        var counterArray = [];
-        function getMax(arr){
-          arr.forEach(function(d){
-            counterArray.push(d.counter);
-            getMax(d.children)
-          });
-        }
-        getMax(_nodes.children);
-        var maxCounter = counterArray.reduce(function(a, b){ 
-          return a > b ? a : b
-        });
-
-        _ramp = d3.scale.linear().domain([0, maxCounter]).range(["blue","red"])
-
         return _chart;
     };
     
@@ -248,16 +255,24 @@ var chart = tree();
 paintSentenceGraph.last_query = "";
 
 function paintSentenceGraph(type) {
-	
+  var $docs = $("#document_holder textarea");
+  var corpus = [];
+  $docs.each(function(index, elem){
+    corpus.push(elem.value);
+  });
+
+  var corpusJSON = JSON.stringify(corpus);
+
 	query = encodeURIComponent($("#input_text").val());
 
     if(query !== ""){
-      if(query !== paintSentenceGraph.last_query){
-      url = "http://127.0.0.1:12000/analyze_sentence?" + query;
+      if(corpusJSON !== paintSentenceGraph.last_query){
+      url = "http://127.0.0.1:12000/analyze_corpus";
 
         $.ajax({
-            type : "GET",
-            url : url
+            type : "POST",
+            url : url,
+            data: corpusJSON
         }).done(function(msg) {
             var root = {}
             if (msg.length > 1) {
@@ -269,9 +284,9 @@ function paintSentenceGraph(type) {
             } else {
               root = msg[0];
             }
-
+            console.log(root)
             paintSentenceGraph.data = root;
-
+  
             switch(type){
               case "text":              
                 renderText(paintSentenceGraph.data);
@@ -281,7 +296,7 @@ function paintSentenceGraph(type) {
               break;
             }
 
-            paintSentenceGraph.last_query  = query;
+            paintSentenceGraph.last_query  = corpusJSON;
         });
       } else {
            switch(type){
@@ -300,9 +315,8 @@ function paintSentenceGraph(type) {
 }
 
 function clearSentence(){
-	$("#input_text").val("");
 	d3.select("#graph").remove();
-    d3.select("#dendogram").remove();
+  d3.select("#dendogram").remove();
 	chart = tree();
 }
 
@@ -340,17 +354,17 @@ var svg = d3.select("body").append("svg")
 
   var nodes = cluster.nodes(input),
       links = cluster.links(nodes);
-
+  
   var link = svg.selectAll(".link")
       .data(links)
-    .enter().append("path")
+      .enter().append("path")
       .attr("id",function(d){ return d.synsetid })
       .attr("class", "link")
       .attr("d", diagonal);
 
   var node = svg.selectAll(".node")
       .data(nodes)
-    .enter().append("g")
+      .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
 
@@ -364,50 +378,41 @@ var svg = d3.select("body").append("svg")
   return svg;
 }
 
-
+var docCount = 1;
 $(function() {
-  $( document ).tooltip({
-    content: function() {
-        return $(this).attr('title');
-    }
-  });
-  $("#analyze").on("click", function(){
+  $body = $("body");
+  $body.append("<div id='spinnerContainer'></div>");
+  $spinnerContainer = $("#spinnerContainer");
+  $spinnerContainer.append("<div id='spinner'></div>")
+  $("#spinner").append("<div id='loader'></div>");
 
-    var opts = {
-      lines: 13, // The number of lines to draw
-      length: 20, // The length of each line
-      width: 10, // The line thickness
-      radius: 30, // The radius of the inner circle
-      corners: 1, // Corner roundness (0..1)
-      rotate: 0, // The rotation offset
-      direction: 1, // 1: clockwise, -1: counterclockwise
-      color: '#000', // #rgb or #rrggbb or array of colors
-      speed: 1, // Rounds per second
-      trail: 60, // Afterglow percentage
-      shadow: false, // Whether to render a shadow
-      hwaccel: false, // Whether to use hardware acceleration
-      className: 'spinner', // The CSS class to assign to the spinner
-      zIndex: 2e9, // The z-index (defaults to 2000000000)
-      top: '50%', // Top position relative to parent
-      left: '50%' // Left position relative to parent
-    };
-   $("body").append("<div id='spinnerContainer'></div>");
-   $("#spinnerContainer").append("<div id='spinner'></div>")
-   $("#spinner").append("<div id='loader'></div>");
 
-    d3.select("#dendogram").remove();
+  $document_holder = $("#document_holder");
+  $document_holder.append("<h3>Document " + docCount + " </h3>")
+  $document_holder.append("<textarea rows=4> </textarea>");
+
+  $addDocumentBtn = $("#add_document_button");
+  $addDocumentBtn.on("click", function(){
+  	docCount += 1;
+  	$document_holder.append("<h3>Document " + docCount + " </h3>")
+  	$document_holder.append("<textarea rows=4> </textarea>");
+  })
+
+  $("#analyze_button").on("click", function(){
+    $spinnerContainer.fadeIn();
+    $("body").css({"overflow-y":"scroll"});
+    $(".row").hide();
+    $("#back_button").show();
+
     d3.select("#graph").remove();
     chart = tree();
     paintSentenceGraph("graph");  
   });
- 
-  $("#text").on("click", function(){
-    d3.select("#dendogram").remove();
-    d3.select("#graph").remove();
-    chart = tree();
-    paintSentenceGraph("text");
-  });
-  $("#clear").on("click", function(){
+
+  $("#back_button").on("click",function(){
     clearSentence();
+    $(this).hide();
+    $(".row").fadeIn("normal");
   })
+
 });
