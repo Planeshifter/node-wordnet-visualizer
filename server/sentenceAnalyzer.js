@@ -4,7 +4,7 @@ var Promise = require("bluebird");
 var traceur = require("traceur");
 var ndarray = require("ndarray");
 var unpack = require("ndarray-unpack");
-var sena = traceur.require("./sentenceHypernymTree3.js");
+var analyzeCorpus = traceur.require("./sentenceHypernymTree4.js");
 
 function getChildren(id, synArray, adjac){
 	
@@ -44,13 +44,13 @@ function formD3Tree(synArray, adjac){
 		  }); 
   }
   
-  attachChildren(roots);
+  roots = attachChildren(roots);
   return roots;
 }
 
 export var getD3Tree = function(corpus){
 
-  var analyzerPromise = sena.analyzeCorpus(corpus);
+  var analyzerPromise = analyzeCorpus(corpus);
   return analyzerPromise.then(function(data){
     return formD3Tree(data.synsets, data.adjMatrix);
   });

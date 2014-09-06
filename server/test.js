@@ -1,7 +1,9 @@
 var traceur = require("traceur");
-var sena = traceur.require("sentenceHypernymTree3.js");
+var args = process.argv.slice(2);
 
-sena.analyzeCorpus(["soldier"]).then(function(x){
+var analyzeCorpus = traceur.require("sentenceHypernymTree4.js");
+
+analyzeCorpus(args).then(function(x){
 	console.log(x.synsets)
 })
 

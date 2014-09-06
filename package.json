@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "d3": "~3.4.11",
-    "wordnet-magic": "0.1.0",
     "underscore": "~1.6.0",
     "underscore.string": "~2.3.3",
     "bluebird": "~2.3.0",
@@ -35,6 +34,8 @@
     "traceur": "0.0.58",
     "ndarray": "~1.0.15",
     "ndarray-ops": "~1.2.2",
-    "ndarray-unpack": "~1.0.0"
+    "ndarray-unpack": "~1.0.0",
+    "wordnet-magic": "~0.2.1",
+    "ndarray-bit": "~1.0.0"
   }
 }
