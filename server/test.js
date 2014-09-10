@@ -1,9 +1,15 @@
 var traceur = require("traceur");
+var util = require("util");
 var args = process.argv.slice(2);
 
-var analyzeCorpus = traceur.require("sentenceHypernymTree4.js");
+var analyzeCorpus = require("./synsetRepresentation.js");
+var constructSynsetData = require("./semanticTree.js");
 
-analyzeCorpus(args).then(function(x){
-	console.log(x.synsets)
+analyzeCorpus(args).then(function(corpus){
+  corpus.forEach(function(d){
+    d.forEach(function(w){
+      constructSynsetData(w)
+    })
+  })
 })
 

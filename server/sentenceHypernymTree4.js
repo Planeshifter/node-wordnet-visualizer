@@ -15,7 +15,7 @@ module.exports = function analyzeCorpus(docs){
   var getWordSynsets = memoize(function(word){
   	var ret = word.getSynsets().map(s => {
   	  s.hypernym = s.getHypernymTree();
-  	  return Promise.props(s);		
+  	  return Promise.props(s);
   	});
   	return Promise.all(ret);
   });
@@ -27,13 +27,13 @@ module.exports = function analyzeCorpus(docs){
   	return ret;
   }
 
-  function constructSynsetData(synsetsArr){	
+  function constructSynsetData(synsetsArr){
 
     console.log(synsetsArr)
-  	
+
   		var adjMatrix = ndbits([100, 100]);
-          var synsets = [];	
-           
+          var synsets = [];
+
           function processObject(obj){
   	        if (obj.hypernym.length !== 0){
   	          if (!idStore.some(id => id === obj.hypernym[0].synsetid)){
@@ -45,25 +45,25 @@ module.exports = function analyzeCorpus(docs){
 
   	          var parentIndex = idStore.indexOf(obj.hypernym[0].synsetid);
   	          var childIndex = idStore.indexOf(obj.synsetid);
-  			  adjMatrix.set(parentIndex, childIndex, true);  	
-  			}  
+  			  adjMatrix.set(parentIndex, childIndex, true);
+  			}
 
   	    	var selectedSynset = synsets.filter(elem => elem.synsetid == obj.synsetid);
   		    if (selectedSynset.length === 0){
-  			  synsets.push(obj); 
-  		    } 
+  			  synsets.push(obj);
+  		    }
   		    if (obj.hypernym.length !== 0) processObject(obj.hypernym[0]);
-  		    return;  
+  		    return;
     		}
 
     		synsetsArr.forEach(synset => processObject(synset));
   		var data = {};
   		data.synsets = synsets.map(elem => {
-  			if (!elem.hypernym) elem.root = true 
+  			if (!elem.hypernym) elem.root = true
   			else elem.root = false;
   			elem.counter = 1;
   			return elem;
-   		}); 
+   		});
   		data.adjMatrix = adjMatrix;
     		return data;
   }
@@ -71,13 +71,13 @@ module.exports = function analyzeCorpus(docs){
 
   /*
   @wordArray: array of words of a single document
-  */ 
+  */
   function processWordArray(wordArray){
     var wordArrayPromise = wordArray.map(x => wn.morphy(x));
     var synsetsPromise = Promise.all(wordArrayPromise)
     						.then(elem => elem.filter(elem => elem.length >= 1))
     						.then(elem => elem.map(arr => new wn.Word(arr[0].lemma,"n")))
-  						.then(arr => arr.map(w => getWordSynsets(w)));		
+  						.then(arr => arr.map(w => getWordSynsets(w)));
     return synsetsPromise;
   }
 
@@ -110,7 +110,7 @@ module.exports = function analyzeCorpus(docs){
 
   	var prunedTree = mergedDocData.map( (doc, i) => {
   		return Promise.join(synsetsTrees[i], doc, function(wordSynsets, arr){
-      		return pruneDocumentTree(arr, wordSynsets);  
+      		return pruneDocumentTree(arr, wordSynsets);
     		});
   	});
 
@@ -133,7 +133,7 @@ module.exports = function analyzeCorpus(docs){
     var res = arr.reduce(function(a, b){
       a.synsets = synsetUnion(a.synsets, b.synsets);
       ops.add(a.adjMatrix, b.adjMatrix, a.adjMatrix);
-      return a;      
+      return a;
     });
     res.adjMatrix.idStore = idStore;
     return res;
@@ -147,7 +147,7 @@ module.exports = function analyzeCorpus(docs){
         syn1.filter(synset1 => synset1.synsetid === elem.synsetid).map(foundSynset => {
         	foundSynset.counter++;
         	return foundSynset;
-        })	
+        })
       } else {
         syn1.push(elem);
       }
@@ -159,7 +159,7 @@ module.exports = function analyzeCorpus(docs){
   function pruneDocumentTree(arr, wordSynsetsArray){
     var synsets = arr.synsets;
     var adjMatrix = arr.adjMatrix;
-   
+
     var toKeepSynsets = wordSynsetsArray.map(function(wArr){
       var weights = [];
 
@@ -171,7 +171,7 @@ module.exports = function analyzeCorpus(docs){
             parents.push(hypernym.synsetid)
             traverseTree(hypernym);
           }, child);
-        } 
+        }
         traverseTree(s)
         var wordCountArray = parents.map(id => {
           var ret = synsets.filter(s => s.synsetid === id).map(e => e.counter);
@@ -191,14 +191,14 @@ module.exports = function analyzeCorpus(docs){
 
     toKeepSynsets = _.flatten(toKeepSynsets);
 
-    return createPrunedTree(toKeepSynsets); 
-   
+    return createPrunedTree(toKeepSynsets);
+
   }
 
   function createPrunedTree(toKeepSynsets){
 
         var adjMatrix = ndarray(Int8Array(100 * 100), [100, 100]);
-        var synsets = []; 
+        var synsets = [];
 
           function processObject(obj){
             if (obj.hypernym.length !== 0){
@@ -211,15 +211,15 @@ module.exports = function analyzeCorpus(docs){
 
               var parentIndex = idStore.indexOf(obj.hypernym[0].synsetid);
               var childIndex = idStore.indexOf(obj.synsetid);
-          adjMatrix.set(parentIndex, childIndex, 1);    
-        }  
+          adjMatrix.set(parentIndex, childIndex, 1);
+        }
 
           var selectedSynset = synsets.filter(elem => elem.synsetid == obj.synsetid);
           if (selectedSynset.length === 0){
-            synsets.push(obj); 
-          } 
+            synsets.push(obj);
+          }
           if (obj.hypernym.length !== 0) processObject(obj.hypernym[0]);
-          return;  
+          return;
         }
         toKeepSynsets.forEach(elem => processObject(elem));
 
