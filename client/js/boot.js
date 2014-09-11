@@ -98,22 +98,34 @@ function tree() {
                 .attr("class","synsetNode")
                 .style("fill", "steelblue")
                 .attr("title",function(d){
-                	var str = "Definition: " + d.definition + "<br\>";
-                	str += "POS: " + d.pos;
+                	var str = "Definition: " + d.data.definition + "<br\>";
+                	str += "POS: " + d.data.pos;
                 	str += "<br\>";
-                	str += "Lexical Domain: " + d.lexdomain;
+                	str += "Lexical Domain: " + d.data.lexdomain;
                   str += "<br\>";
-                  str += "Counter: " + d.counter;
+                  str += "Counter: " + d.count;
+                  str += "Corpus words: " + d.words;
                 	return str; })
                 .on("mouseover", function(d) {
-
-                  var str = "<strong>Definition:</strong> " + d.definition + "<br\>";
-                  str += "<strong>POS</strong>: " + d.pos;
-                  str += "<br\>";
-                  str += "<strong>Lexical Domain:</strong> " + d.lexdomain;
-                  str += "<br\>";
-                  str += "<strong>Count:</strong> " + d.counter;
-    
+                  var str = "";
+                  if (d.words){
+                    str += "<strong>Words:</strong> " + d.words.join(", ");
+                    str += "<br\>"
+                    str += "<strong>Definition:</strong> " + d.data.definition + "<br\>";
+                    str += "<strong>POS</strong>: " + d.data.pos;
+                    str += "<br\>";
+                    str += "<strong>Lexical Domain:</strong> " + d.data.lexdomain;
+                    str += "<br\>";
+                    str += "<strong>Count:</strong> " + d.count;
+                  }
+                  else {
+                    str += "<strong>Definition:</strong> " + d.data.definition + "<br\>";
+                    str += "<strong>POS</strong>: " + d.data.pos;
+                    str += "<br\>";
+                    str += "<strong>Lexical Domain:</strong> " + d.data.lexdomain;
+                    str += "<br\>";
+                    str += "<strong>Count:</strong> " + d.count;
+                  }
                     div.transition()        
                        .duration(200)      
                        .style("opacity", .9);      
@@ -167,7 +179,7 @@ function tree() {
                 })
                 .text(function (d) {
                 	console.log(d.words)
-                    var words =  d.words.slice(0, 3).map(function(e){ return e.lemma; });
+                    var words =  d.data.words.slice(0, 3).map(function(e){ return e.lemma; });
                     return words.join(", ");
                 })
                 .style("fill-opacity", 1e-6);
@@ -274,16 +286,16 @@ function paintSentenceGraph(type) {
             url : url,
             data: corpusJSON
         }).done(function(msg) {
-            var root = {}
-            if (msg.length > 1) {
-              root.words = [{lemma: "root"}];
-              root.lexdomain = "NA";
-              root.definition = "NA";
-              root.pos = "NA";
-              root.children = msg;
-            } else {
-              root = msg[0];
-            }
+            var root = msg;
+            root.data = {};
+            root.count = "NA";
+            root.parentId = "NA";
+            root.words = "NA";
+            root.data.words = [{lemma: "root"}];
+            root.data.lexdomain = "NA";
+            root.data.definition = "NA";
+            root.data.pos = "NA";
+            root.data.children = msg;
             console.log(root)
             paintSentenceGraph.data = root;
   
@@ -354,6 +366,8 @@ var svg = d3.select("body").append("svg")
 
   var nodes = cluster.nodes(input),
       links = cluster.links(nodes);
+
+  console.log(_nodes)
   
   var link = svg.selectAll(".link")
       .data(links)

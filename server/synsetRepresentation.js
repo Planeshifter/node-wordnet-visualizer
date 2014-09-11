@@ -109,11 +109,11 @@ module.exports = function getCorpusSynsets(docs){
     lexdomain: 'noun.plant',
     hypernym: [ [Object] ] },
   */
-  var getWordSynsets = memoize(function(word){
+  var getWordSynsets = function(word){
     var ret = word.getSynsets().map(function(s){
       s.hypernym = s.getHypernymTree();
       return Promise.props(s);
     });
     return Promise.all(ret);
-  });
+  };
 

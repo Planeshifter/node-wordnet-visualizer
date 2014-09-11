@@ -64,9 +64,9 @@ function Tree(){
 
   this.jumpTo =  function(data){
     var targetID = data.synsetid;
-    console.log(this.root.children[0].children)
-   console.log('TARGET:' + data.synsetid)
-   //oonsole.log(util.inspect(self, null,7))
+   // console.log(this.root.children[0].children)
+   //console.log('TARGET:' + data.synsetid)
+   //Console.log(util.inspect(self, null,7))
     return self.searchTree(self.root, "synsetid", targetID);
   },
 
@@ -76,10 +76,10 @@ function Tree(){
           return node;
      } else if (node.children.length !== 0){
           var result = null;
-          console.log(node.children.length)
+         // console.log(node.children.length)
           for(var i=0; result == null && i < node.children.length; i++){
                // console.log(node.children[i].data.synsetid)
-               console.log("i:" + i)
+              //  console.log("i:" + i)
                result = self.searchTree(node.children[i], key, value);
           }
           return result;
@@ -87,6 +87,22 @@ function Tree(){
      return null;
   }
 
+  this.mergeTree = function(tree){
+    function mergeChildren(node){
+      var childs = node.children;
+      childs.forEach(function(elem){
+        var target = self.jumpTo(node); 
+        if (target.selectChildrenByKey("synsetid", elem.data.synsetid)) {
+          
+        }
+        else {
+          target.appendChildNode(elem);
+        }
+        }
+      });
+    }
+    mergeChildren(tree.root);
+  }
 }
 
 function TreeNode(data, parent){
@@ -107,6 +123,18 @@ TreeNode.prototype = {
 
     if (!alreadyPresent) this.children.push(insertNode);
     else console.log('ist schon da')
+  },
+  appendChildNode: function(insertNode){
+    var alreadyPresent = this.children.some(function(node){
+      return _.isEqual(node.data, insertNode.data);
+    });
+    if (!alreadyPresent) this.children.push(insertNode);
+    else console.log('ist schon da')
+  },
+  selectChildrenByKey: function(key, value){
+    return this.children.filter(function(elem){
+      return elem[key] === value;
+    });
   }
 }
 

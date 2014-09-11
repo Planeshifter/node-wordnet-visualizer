@@ -1,57 +1,50 @@
 var tm = require("text-miner");
 var wn = require("wordnet-magic");
 var Promise = require("bluebird");
-var traceur = require("traceur");
-var ndarray = require("ndarray");
-var unpack = require("ndarray-unpack");
-var analyzeCorpus = traceur.require("./sentenceHypernymTree4.js");
 
-function getChildren(id, synArray, adjac){
-	
-	var ndarrayId = adjac.idStore.indexOf(id);
-	var childrenNdArray = adjac.pick(ndarrayId, null);
-	var childrenIds = [];
-	for (var i=0; i < childrenNdArray.size; i++){
-	  if (childrenNdArray.get(i) > 0) {
-	    childrenIds.push(adjac.idStore[i]);
-	  }  	
-	}
-	var children = synArray.filter(function(elem){
-	  return childrenIds.some(function(id){
-	    return id == elem.synsetid;	  
-	  });
-	});
-	return children;
-}
+var _ = require("underscore");
 
-function formD3Tree(synArray, adjac){
-  var roots = [];
-  
-  synArray.forEach(function(elem){
-  
-    if (Array.isArray(elem.hypernym) && elem.hypernym.length === 0){
-      roots.push(elem);
-    }	
-  });
-  
-  function attachChildren(arr){
-	 return arr.map(function(elem){
-		    var children = getChildren(elem.synsetid, synArray, adjac);  
-		    delete elem.hypernym;
-		    attachChildren(children);
-			elem.children = children;	
-			return elem;
-		  }); 
+var analyzeCorpus = require("./synsetRepresentation.js");
+var constructSynsetData = require("./idea.js");
+var mergeWordTrees = require("./mergeWordTrees.js")
+var pruneTree = require("./pruneTree.js")
+var mergeDocTrees = require("./mergeDocTrees.js")
+
+function formD3Tree(tree){
+// initialize child arrays
+  for (var key in tree){
+  	tree[key].children = [];
   }
-  
-  roots = attachChildren(roots);
-  return roots;
+  tree["root"] = {};
+  tree["root"].children = [];
+
+  for (var key in tree){
+    var currentNode = tree[key];
+    if (currentNode.parentId && tree[currentNode.parentId]){
+    	tree[currentNode.parentId].children.push(currentNode);
+	}
+  }
+  return tree["root"];
 }
 
-export var getD3Tree = function(corpus){
+module.exports = function getD3Tree(corpus){
+  var corpusTreePromise = analyzeCorpus(corpus).then(function(corpus){
+  	var docTrees = corpus.map(function(d){
+    	var wordTrees = d.map(function(w){
+      		return constructSynsetData(w);
+    	});
+    	return mergeWordTrees(wordTrees);
+  	});
+  	console.log(docTrees)
+  	//docTrees = docTrees.map(function(d){
+    //	return pruneTree(d, 2);
+  	//});
+  	return mergeDocTrees(docTrees);
+  })
 
-  var analyzerPromise = analyzeCorpus(corpus);
-  return analyzerPromise.then(function(data){
-    return formD3Tree(data.synsets, data.adjMatrix);
-  });
+  return corpusTreePromise.then(function(data){
+    var ret = formD3Tree(data);
+    console.log(ret)
+    return ret;
+  })
 }	

@@ -12,7 +12,7 @@ _.str.include('Underscore.string', 'string'); // => true
 var http = require("http");
 var url = require("url");
 var qs = require("querystring");
-var sena = traceur.require("./sentenceAnalyzer.js");
+var getD3Tree = require("./sentenceAnalyzer.js");
 
 http.createServer(function (request, response) { 
 	 
@@ -39,7 +39,7 @@ http.createServer(function (request, response) {
 
             var POST = JSON.parse(body);
             
-            var Prom = sena.getD3Tree(POST);
+            var Prom = getD3Tree(POST);
             Prom.then(function(roots){
 		      var msg = JSON.stringify(roots);
 			  response.end(msg);
