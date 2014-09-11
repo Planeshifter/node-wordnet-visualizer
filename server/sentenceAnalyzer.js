@@ -36,9 +36,9 @@ module.exports = function getD3Tree(corpus){
     	return mergeWordTrees(wordTrees);
   	});
   	console.log(docTrees)
-  	//docTrees = docTrees.map(function(d){
-    //	return pruneTree(d, 2);
-  	//});
+  	docTrees = docTrees.map(function(d){
+    	return pruneTree(d, 2);
+  	});
   	return mergeDocTrees(docTrees);
   })
 
