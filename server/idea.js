@@ -18,11 +18,13 @@ module.exports = function constructSynsetData(word){
   })
 
   synsetArr.forEach(function(bs){
+  	bs.ancestors = [];
     function createAncestorArr(synset){
       wordTree[synset.synsetid] = new SynsetNode(synset, word);
       if (synset.hypernym && synset.hypernym[0]){
         createAncestorArr(synset.hypernym[0]);
-        synset.hypernym = null;
+        bs.ancestors.push(synset.hypernym[0].synsetid)
+        // synset.hypernym = null;
       } 
     }
     createAncestorArr(bs);
@@ -32,11 +34,12 @@ module.exports = function constructSynsetData(word){
 
 function SynsetNode(synset, word){
     if(synset.hypernym && synset.hypernym.length > 0){
-    	this.parentId = synset.hypernym[0].synsetid
+    	this.parentId = synset.hypernym[0].synsetid;
     } else {
     	this.parentId = "root";
     }
-	this.data = synset
+	this.data = _.clone(synset);
+	this.data.hypernym = null;
 	this.count = word.count || 1;
 	this.words = synset.word || null;
 }

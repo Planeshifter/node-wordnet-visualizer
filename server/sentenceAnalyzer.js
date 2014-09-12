@@ -1,13 +1,14 @@
 var tm = require("text-miner");
 var wn = require("wordnet-magic");
 var Promise = require("bluebird");
-
+var util = require("util");
 var _ = require("underscore");
 
 var analyzeCorpus = require("./synsetRepresentation.js");
 var constructSynsetData = require("./idea.js");
 var mergeWordTrees = require("./mergeWordTrees.js")
 var pruneTree = require("./pruneTree.js")
+var pickSynsets = require("./pickSynsets.js")
 var mergeDocTrees = require("./mergeDocTrees.js")
 
 function formD3Tree(tree){
@@ -35,7 +36,9 @@ module.exports = function getD3Tree(corpus){
     	});
     	return mergeWordTrees(wordTrees);
   	});
-  	console.log(docTrees)
+  	docTrees = docTrees.map(function(d){
+  		return pickSynsets(d);
+  	});
   	docTrees = docTrees.map(function(d){
     	return pruneTree(d, 2);
   	});
@@ -44,7 +47,7 @@ module.exports = function getD3Tree(corpus){
 
   return corpusTreePromise.then(function(data){
     var ret = formD3Tree(data);
-    console.log(ret)
+    //console.log(util.inspect(ret, null, 4));
     return ret;
   })
 }	

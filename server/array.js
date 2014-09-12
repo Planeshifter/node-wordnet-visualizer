@@ -14,6 +14,14 @@ function registerMethod(obj, name, fun){
 	}
 }
 
+registerMethod(Array.prototype, "max", function(){
+	return Math.max.apply( Math, this);
+})
+
+registerMethod(Array.prototype, "min", function(){
+	return Math.min.apply( Math, this);
+})
+
 registerMethod(Array.prototype, "contains", function(elem){
 	for (var q = 0; q < this.length; q++)
     {

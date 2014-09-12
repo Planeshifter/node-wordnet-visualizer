@@ -1,4 +1,3 @@
-var traceur = require("traceur");
 var util = require("util");
 var args = process.argv.slice(2);
 
@@ -7,6 +6,7 @@ var constructSynsetData = require("./idea.js");
 var mergeWordTrees = require("./mergeWordTrees.js")
 var pruneTree = require("./pruneTree.js")
 var mergeDocTrees = require("./mergeDocTrees.js")
+var pickSynsets = require("./mergeDocTrees.js")
 
 analyzeCorpus(args).then(function(corpus){
   var docTrees = corpus.map(function(d){
@@ -14,6 +14,9 @@ analyzeCorpus(args).then(function(corpus){
       return constructSynsetData(w)
     });
     return mergeWordTrees(wordTrees);
+  });
+  docTrees = docTrees.map(function(d){
+    return pickSynsets(d);
   });
   docTrees = docTrees.map(function(d){
     return pruneTree(d, 2);
