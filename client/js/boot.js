@@ -273,7 +273,7 @@ function paintSentenceGraph(type) {
     corpus.push(elem.value);
   });
 
-  var treshold = 2;
+  var treshold = $("#pruning_treshold").val();
   var postData = {"corpus": corpus,
                   "treshold": treshold};
   var postDataJSON = JSON.stringify(postData);

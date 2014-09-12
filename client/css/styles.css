@@ -116,6 +116,24 @@ legend{
 	float: right;
 }
 
+#pruning_input{
+  float: right;
+  height: 45px;
+}
+
+#pruning_treshold{
+ height: 30px;
+ margin-right: 10px;
+ padding-right: 10px;
+ margin-left: -2px;
+}
+
+#pruning_treshold_label{
+  float: left;
+  font-size: 10px;
+  height: 10px;
+}
+
 #analyze {
 	float: right;
 }
