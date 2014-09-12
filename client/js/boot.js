@@ -173,6 +173,7 @@ function tree() {
                 .attr("x", function (d) {
                     return d.children || d._children ? -10 : 10;
                 })
+                .attr("class","synsetLabels")
                 .attr("dy", ".35em")
                 .attr("text-anchor", function (d) {
                     return d.children || d._children ? "end" : "start";
@@ -189,6 +190,20 @@ function tree() {
 
         nodeExit.select("text")
                 .style("fill-opacity", 1e-6);
+
+        nodeEnter.append("svg:text")
+                 .attr("class","words")
+                 .attr("x", function (d) {
+                    return d.children || d._children ? -10 : 10;
+                })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function (d) {
+                    return d.children || d._children ? "end" : "start";
+                })
+                .text(function (d) {
+                    var words =  d.words || [];
+                    return words.slice(0,3).join(", ");
+                })
     }
 
     function renderLinks(nodes, source) {
@@ -292,7 +307,7 @@ function paintSentenceGraph(type) {
             root.data = {};
             root.count = "NA";
             root.parentId = "NA";
-            root.words = "NA";
+            root.words = null;
             root.data.words = [{lemma: "root"}];
             root.data.lexdomain = "NA";
             root.data.definition = "NA";
