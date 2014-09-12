@@ -28,7 +28,8 @@ function formD3Tree(tree){
   return tree["root"];
 }
 
-module.exports = function getD3Tree(corpus){
+module.exports = function getD3Tree(corpus, treshold){
+  var wordTreshold = treshold || 1;
   var corpusTreePromise = analyzeCorpus(corpus).then(function(corpus){
   	var docTrees = corpus.map(function(d){
     	var wordTrees = d.map(function(w){
@@ -40,7 +41,7 @@ module.exports = function getD3Tree(corpus){
   		return pickSynsets(d);
   	});
   	docTrees = docTrees.map(function(d){
-    	return pruneTree(d, 2);
+    	return pruneTree(d, wordTreshold);
   	});
   	return mergeDocTrees(docTrees);
   })

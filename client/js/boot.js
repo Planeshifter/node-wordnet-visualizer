@@ -273,18 +273,20 @@ function paintSentenceGraph(type) {
     corpus.push(elem.value);
   });
 
-  var corpusJSON = JSON.stringify(corpus);
-
+  var treshold = 2;
+  var postData = {"corpus": corpus,
+                  "treshold": treshold};
+  var postDataJSON = JSON.stringify(postData);
 	query = encodeURIComponent($("#input_text").val());
 
     if(query !== ""){
-      if(corpusJSON !== paintSentenceGraph.last_query){
-      url = "http://127.0.0.1:12000/analyze_corpus";
+      if(postDataJSON !== paintSentenceGraph.last_query){
+      url = "http://philipp-burckhardt.com:12000/analyze_corpus";
 
         $.ajax({
             type : "POST",
             url : url,
-            data: corpusJSON
+            data: postDataJSON
         }).done(function(msg) {
             var root = msg;
             root.data = {};

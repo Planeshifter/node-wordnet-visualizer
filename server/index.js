@@ -39,7 +39,7 @@ http.createServer(function (request, response) {
 
             var POST = JSON.parse(body);
             
-            var Prom = getD3Tree(POST);
+            var Prom = getD3Tree(POST.corpus, POST.treshold);
             Prom.then(function(roots){
 		      var msg = JSON.stringify(roots);
 			  response.end(msg);

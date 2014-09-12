@@ -31,11 +31,11 @@ module.exports = function getCorpusSynsets(docs){
         .removeInterpunctuation()
         .removeNewlines()
         .toLower()
-        .removeWords(tm.STOPWORDS.EN)
-        .clean();
-
+        .clean()
+        .removeWords(tm.STOPWORDS.EN);
+  
     var wordArrays = corpus.documents.map(function(x){ return x.split(" ")});
-
+    console.log(wordArrays)
     /*
     takes word arrays and maps them to arrays objects containing unique words plus counter, e.g.
     [ [ 'happy' ], [ 'oranges', 'lemons', 'and', 'oranges' ] ]
