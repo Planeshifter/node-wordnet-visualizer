@@ -6,7 +6,7 @@ module.exports = function mergeDocTrees(docArr){
       var currentSynset = masterTree[key];
       if (currentSynset){
        	currentSynset.count++;
-      	currentSynset.words = currentSynset.words.concat(d[key].words);
+      	currentSynset.words ? currentSynset.words = currentSynset.words.concat(d[key].words) : currentSynset.words = d[key].words;
       } else {
         masterTree[key] = d[key];
       }
