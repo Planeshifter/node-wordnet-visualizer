@@ -1,5 +1,4 @@
 var util = require("util");
-var traceur = require("traceur");
 
 var _ = require('underscore');
 //Import Underscore.string to separate object, because there are conflict functions (include, reverse, contains)
@@ -15,7 +14,6 @@ var qs = require("querystring");
 var getD3Tree = require("./sentenceAnalyzer.js");
 
 http.createServer(function (request, response) { 
-	 
 	 if (request.method == 'POST') {
 	 	console.log("Here comes a post");
 		var pathname = url.parse(request.url).pathname;
@@ -38,7 +36,7 @@ http.createServer(function (request, response) {
 	    
 
             var POST = JSON.parse(body);
-            
+            console.log(POST)
             var Prom = getD3Tree(POST.corpus, POST.treshold);
             Prom.then(function(roots){
 		      var msg = JSON.stringify(roots);
@@ -78,3 +76,4 @@ http.createServer(function (request, response) {
 	}
 	}
 }).listen(12000);
+console.log("Server is listening");

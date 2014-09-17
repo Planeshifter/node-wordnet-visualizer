@@ -1,5 +1,6 @@
 module.exports = function mergeDocTrees(docArr){
   var masterTree = docArr.shift();
+    console.log(masterTree)
   docArr.forEach(function(d){
     for (var key in d){
       var currentSynset = masterTree[key];

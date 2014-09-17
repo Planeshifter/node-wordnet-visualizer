@@ -30,6 +30,7 @@ function formD3Tree(tree){
 
 module.exports = function getD3Tree(corpus, treshold){
   var wordTreshold = treshold || 1;
+  console.log(corpus)
   var corpusTreePromise = analyzeCorpus(corpus).then(function(corpus){
   	var docTrees = corpus.map(function(d){
     	var wordTrees = d.map(function(w){
