@@ -23,7 +23,6 @@ function tree() {
                     .attr("height", _height)
                     .attr("width", _width)
                     .attr("id", "graph");
-                    						
         }
 
         renderBody(_svg);
@@ -109,7 +108,8 @@ function tree() {
                 .on("mouseover", function(d) {
                   var str = "";
                   if (d.words){
-                    str += "<strong>Words:</strong> " + d.words.join(", ");
+                    str += "<strong>Words:</strong> " + d.words.map(function(x){ 
+                      return x.string + "(" + x.count + ")"}).join(" , ");
                     str += "<br\>"
                     str += "<strong>Definition:</strong> " + d.data.definition + "<br\>";
                     str += "<strong>POS</strong>: " + d.data.pos;
@@ -191,25 +191,11 @@ function tree() {
         nodeExit.select("text")
                 .style("fill-opacity", 1e-6);
 
-        nodeEnter.append("svg:text")
-                 .attr("class","words")
-                 .attr("x", function (d) {
-                    return d.children || d._children ? -10 : 10;
-                })
-                .attr("dy", ".35em")
-                .attr("text-anchor", function (d) {
-                    return d.children || d._children ? "end" : "start";
-                })
-                .text(function (d) {
-                    var words =  d.words || [];
-                    return words.slice(0,3).join(", ");
-                })
     }
 
     function renderLinks(nodes, source) {
         var link = _bodyG.selectAll("path.link")
                 .data(_tree.links(nodes), function (d) {
-                  console.log(d.target.id)
                     return d.target.id;
                 });
 
@@ -289,6 +275,10 @@ function paintSentenceGraph(type) {
   });
 
   var treshold = $("#pruning_treshold").val();
+  if(treshold ==="sqrt(n)"){
+    treshold = Math.sqrt(corpus.length);
+  }
+
   var postData = {"corpus": corpus,
                   "treshold": treshold};
   var postDataJSON = JSON.stringify(postData);
@@ -296,7 +286,7 @@ function paintSentenceGraph(type) {
 
     if(query !== ""){
       if(postDataJSON !== paintSentenceGraph.last_query){
-      url = "http://philipp-burckhardt.com:12000/analyze_corpus";
+      url = "http://localhost:12000/analyze_corpus";
 
         $.ajax({
             type : "POST",
@@ -322,10 +312,30 @@ function paintSentenceGraph(type) {
               break; 
               case "graph":   
                 chart.nodes(root).render();
+                //get svg element.
+                var svg = document.getElementById("graph");
+
+                //get svg source.
+                var serializer = new XMLSerializer();
+                var source = serializer.serializeToString(svg);
+    
+                //add name spaces.
+                if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                    source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                }
+                if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+                    source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+                }
+                //add xml declaration
+                source = '<?xml version="1.0" standalone="no"?><?xml-stylesheet href="styles.css" type="text/css"?> \r\n' + source;
+                //convert svg source to URI data scheme.
+                var url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
+                document.getElementById("save_svg_button").href = url;
+
               break;
             }
 
-            paintSentenceGraph.last_query  = corpusJSON;
+            paintSentenceGraph.last_query  = postDataJSON;
         });
       } else {
            switch(type){
@@ -404,7 +414,10 @@ var svg = d3.select("body").append("svg")
       .attr("dy", 3)
       .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
       .style("-webkit-transform","rotate(0deg)")
-      .text(function(d) { return d.words[0].lemma; });
+      .text(function(d) { 
+        console.log(d.words[0])
+        return d.words[0].lemma; 
+      });
 
   return svg;
 }
@@ -433,16 +446,17 @@ $(function() {
     $spinnerContainer.fadeIn();
     $("body").css({"overflow-y":"scroll"});
     $(".row").hide();
-    $("#back_button").show();
+    $("#plot_menu").show();
 
     d3.select("#graph").remove();
     chart = tree();
     paintSentenceGraph("graph");  
+
   });
 
   $("#back_button").on("click",function(){
     clearSentence();
-    $(this).hide();
+    $("#plot_menu").hide();
     $(".row").fadeIn("normal");
   })
 
