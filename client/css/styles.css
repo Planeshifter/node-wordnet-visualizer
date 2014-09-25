@@ -37,11 +37,18 @@ h1, h2, h3, h4, h5, h6{
     display: none;
 }
 
+#plot_menu{
+  display: none;
+}
+
 #back_button{
 	margin-left: 5px;
-    margin-top: 5px;
-    display: none;
-    position: fixed;
+  margin-top: 5px;
+}
+
+#save_svg_button{
+  margin-left: 5px;
+  margin-top: 5px;
 }
 
 .synsetLabels{
