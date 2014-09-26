@@ -10,6 +10,7 @@ var mergeWordTrees = require("./mergeWordTrees.js")
 var pruneTree = require("./pruneTree.js")
 var pickSynsets = require("./pickSynsets.js")
 var mergeDocTrees = require("./mergeDocTrees.js")
+var propagateWords = require("./propagateWords.js")
 
 function formD3Tree(tree){
 // initialize child arrays
@@ -44,7 +45,9 @@ module.exports = function getD3Tree(corpus, treshold){
   	docTrees = docTrees.map(function(d){
     	return pruneTree(d, wordTreshold);
   	});
-  	return mergeDocTrees(docTrees);
+
+  	var finalTree = mergeDocTrees(docTrees);
+    return propagateWords(finalTree);
   })
 
   return corpusTreePromise.then(function(data){
@@ -52,4 +55,4 @@ module.exports = function getD3Tree(corpus, treshold){
     //console.log(util.inspect(ret, null, 4));
     return ret;
   })
-}	
+}

@@ -11,7 +11,7 @@ module.exports = function mergeWordTrees(wordArr){
       } else {
         masterTree[key] = w[key];
       }
-    }     
+    }
   });
  return masterTree;
 }

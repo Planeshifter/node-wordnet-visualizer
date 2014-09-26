@@ -12,20 +12,21 @@ module.exports = function constructSynsetData(word){
   if (synsetArr === null){
   	return wordTree
   }
-  
+
   synsetArr.forEach(function(bs){
   	bs.word = Array(word.string);
   })
 
   synsetArr.forEach(function(bs){
   	bs.ancestors = [];
+    bs.isLeaf = true;
     function createAncestorArr(synset){
       wordTree[synset.synsetid] = new SynsetNode(synset, word);
       if (synset.hypernym && synset.hypernym[0]){
         createAncestorArr(synset.hypernym[0]);
         bs.ancestors.push(synset.hypernym[0].synsetid)
         // synset.hypernym = null;
-      } 
+      }
     }
     createAncestorArr(bs);
   });
@@ -38,6 +39,7 @@ function SynsetNode(synset, word){
     } else {
     	this.parentId = "root";
     }
+  this.isLeaf = synset.isLeaf || false;
 	this.data = _.clone(synset);
 	this.data.hypernym = null;
 	this.count = word.count || 1;

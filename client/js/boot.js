@@ -9,9 +9,9 @@ function tree() {
             _tree,
             _diagonal,
             _bodyG;
- 
+
    function zoom() {
-	 _svg.attr("transform", "translate("
+	 _svg.select(".body").attr("transform", "translate("
      + d3.event.translate
      + ")scale(" + d3.event.scale + ")");
    }
@@ -22,7 +22,29 @@ function tree() {
             _svg = d3.select("body").append("svg")
                     .attr("height", _height)
                     .attr("width", _width)
-                    .attr("id", "graph");
+                    .attr("id", "graph")
+                    .call( // <-A
+                      d3.behavior.zoom() // <-B
+                      .scaleExtent([1, 8]) // <-C
+                      .on("zoom", zoom) // <-D
+                    );
+
+            //add css stylesheet
+        var svg_style = _svg.append("defs")
+          .append('style')
+          .attr('type','text/css');
+
+        //text of the CSS stylesheet below -- note the multi-line JS requires
+        //escape characters "\" at the end of each line
+        var css_text = "<![CDATA[ \
+             .node circle { \
+                cursor: pointer; \
+                stroke: grey; \
+                stroke-width: 1.5px; \
+            } \
+          ]]> ";
+
+        svg_style.text(css_text);
         }
 
         renderBody(_svg);
@@ -30,21 +52,17 @@ function tree() {
 
     function renderBody(svg) {
         if (!_bodyG) {
-            _bodyG = svg.append("g")
-				.attr("class", "body")
-				.attr("transform", function (d) {
-					return "translate(" + _margins.left 
-						+ "," + _margins.top + ")";
-				}).call( // <-A
-                        d3.behavior.zoom() // <-B
-                        .scaleExtent([1, 8]) // <-C
-                        .on("zoom", zoom) // <-D
-                );
+          _bodyG = svg.append("g")
+    				.attr("class", "body")
+    				.attr("transform", function (d) {
+    					return "translate(" + _margins.left
+    						+ "," + _margins.top + ")";
+    				})
         }
 
         _tree = d3.layout.tree()
                 .size([
-					(_height - _margins.top - _margins.bottom), 
+					(_height - _margins.top - _margins.bottom),
 					(_width - _margins.left - _margins.right)
 				]);
 
@@ -80,7 +98,7 @@ function tree() {
         var nodeEnter = node.enter().append("svg:g")
                 .attr("class", "node")
                 .attr("transform", function (d) {
-                    return "translate(" + source.y0 
+                    return "translate(" + source.y0
 						+ "," + source.x0 + ")";
                 })
                 .on("click", function (d) {
@@ -88,8 +106,8 @@ function tree() {
                     render(d);
                 });
 
-    var div = d3.select("body").append("div")   
-    .attr("class", "tooltip")               
+    var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
     .style("opacity", 0);
 
         nodeEnter.append("svg:circle")
@@ -106,10 +124,13 @@ function tree() {
                   str += "Corpus words: " + d.words;
                 	return str; })
                 .on("mouseover", function(d) {
+                  var wordStrings = Object.keys(d.words);
+                  wordStrings = wordStrings.map(function(s){
+                    return s + "(" + d.words[s] + ")";
+                  });
                   var str = "";
                   if (d.words){
-                    str += "<strong>Words:</strong> " + d.words.map(function(x){ 
-                      return x.string + "(" + x.count + ")"}).join(" , ");
+                    str += "<strong>Words:</strong> " + wordStrings.join(" , ");
                     str += "<br\>"
                     str += "<strong>Definition:</strong> " + d.data.definition + "<br\>";
                     str += "<strong>POS</strong>: " + d.data.pos;
@@ -126,17 +147,17 @@ function tree() {
                     str += "<br\>";
                     str += "<strong>Count:</strong> " + d.count;
                   }
-                    div.transition()        
-                       .duration(200)      
-                       .style("opacity", .9);      
-                    div.html(str)  
-                       .style("left", (d3.event.pageX) + "px")     
-                       .style("top", (d3.event.pageY - 100) + "px");    
-                  })                  
-                .on("mouseout", function(d) {       
-                    div.transition()        
-                        .duration(500)      
-                        .style("opacity", 0);   
+                    div.transition()
+                       .duration(200)
+                       .style("opacity", .9);
+                    div.html(str)
+                       .style("left", (d3.event.pageX) + "px")
+                       .style("top", (d3.event.pageY - 100) + "px");
+                  })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
                 });
 
 
@@ -152,7 +173,7 @@ function tree() {
 
         var nodeExit = node.exit().transition()
                 .attr("transform", function (d) {
-                    return "translate(" + source.y 
+                    return "translate(" + source.y
 						+ "," + source.x + ")";
                 })
                 .remove();
@@ -255,11 +276,11 @@ function tree() {
     };
 
     _chart.nodes = function (n) {
-        if (!arguments.length) return _nodes;  
+        if (!arguments.length) return _nodes;
         _nodes = n;
         return _chart;
     };
-    
+
     return _chart;
 }
 
@@ -305,12 +326,12 @@ function paintSentenceGraph(type) {
             root.data.children = msg;
             console.log(root)
             paintSentenceGraph.data = root;
-  
+
             switch(type){
-              case "text":              
+              case "text":
                 renderText(paintSentenceGraph.data);
-              break; 
-              case "graph":   
+              break;
+              case "graph":
                 chart.nodes(root).render();
                 //get svg element.
                 var svg = document.getElementById("graph");
@@ -318,7 +339,7 @@ function paintSentenceGraph(type) {
                 //get svg source.
                 var serializer = new XMLSerializer();
                 var source = serializer.serializeToString(svg);
-    
+
                 //add name spaces.
                 if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
                     source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
@@ -339,11 +360,11 @@ function paintSentenceGraph(type) {
         });
       } else {
            switch(type){
-              case "text":              
+              case "text":
               console.log(paintSentenceGraph.data)
                 renderText(paintSentenceGraph.data);
-              break; 
-              case "graph":   
+              break;
+              case "graph":
                 chart.nodes(paintSentenceGraph.data).render();
               break;
             }
@@ -363,13 +384,13 @@ function renderText(input){
 
 var countLeafElements = (function (){
   var counter = 0;
-  return function(obj){ 
+  return function(obj){
     if (obj.children && obj.children.length > 0){
       obj.children.forEach(countLeafElements);
     } else {
       counter += 1;
     }
-    return counter;  
+    return counter;
   }
 }());
 
@@ -395,7 +416,7 @@ var svg = d3.select("body").append("svg")
       links = cluster.links(nodes);
 
   console.log(_nodes)
-  
+
   var link = svg.selectAll(".link")
       .data(links)
       .enter().append("path")
@@ -414,9 +435,9 @@ var svg = d3.select("body").append("svg")
       .attr("dy", 3)
       .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
       .style("-webkit-transform","rotate(0deg)")
-      .text(function(d) { 
+      .text(function(d) {
         console.log(d.words[0])
-        return d.words[0].lemma; 
+        return d.words[0].lemma;
       });
 
   return svg;
@@ -450,7 +471,7 @@ $(function() {
 
     d3.select("#graph").remove();
     chart = tree();
-    paintSentenceGraph("graph");  
+    paintSentenceGraph("graph");
 
   });
 
