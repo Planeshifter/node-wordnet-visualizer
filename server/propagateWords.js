@@ -14,6 +14,7 @@ module.exports = function propagateWords(tree){
   for (var key in tree){
     var node = tree[key];
     if (node.words) node.words = _.countBy(node.words);
+    console.log(node.words)
   }
   return tree;
 }

@@ -1,5 +1,5 @@
 var _ = require("underscore");
-var arr = require("./array.js")
+var arr = require("./array.js");
 
 module.exports = function pickSynsets(tree){
 	var baseSynsets = _.filter(tree, function(elem){
@@ -7,14 +7,14 @@ module.exports = function pickSynsets(tree){
 	});
 
 	var groupedSynsets =  _.groupBy(baseSynsets, "words");
-	var allAncestors = baseSynsets.map(function(e){ return e.data.ancestors }) 
+	var allAncestors = baseSynsets.map(function(e){ return e.data.ancestors; });
 	allAncestors = _.flatten(allAncestors);
 	var ancestorCounts = _.countBy(allAncestors);
 
 	for (var key in groupedSynsets){
 		var wordArray = groupedSynsets[key];
 		var scores = wordArray.map(function(w){
-			var score = 0
+			var score = 0;
 			w.data.ancestors.forEach(function(id){
 				score += tree[id].count;
 			});
@@ -25,16 +25,15 @@ module.exports = function pickSynsets(tree){
 
 		var maxScore = scores.max();
 		wordArray.forEach(function(w){
-      	  if (w.score !== maxScore) { 
+      	  if (w.score !== maxScore) {
       	   var ancestors = w.data.ancestors;
       	   delete tree[w.data.synsetid];
       	   ancestors.forEach(function(id){
       	     ancestorCounts[id]--;
       	     if (ancestorCounts[id] === 0) delete tree[id];
       	   });
-      	  }; 
+      	  }
 		});
 	}
-    console.log(groupedSynsets)
 	return tree;
-}
+};

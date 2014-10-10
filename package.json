@@ -36,6 +36,8 @@
     "ndarray-ops": "~1.2.2",
     "ndarray-unpack": "~1.0.0",
     "wordnet-magic": "~0.2.1",
-    "ndarray-bit": "~1.0.0"
+    "ndarray-bit": "~1.0.0",
+    "commander": "~2.3.0",
+    "winston": "~0.8.1"
   }
 }

@@ -32,8 +32,9 @@ module.exports = function getCorpusSynsets(docs){
         .removeNewlines()
         .toLower()
         .clean()
-        .removeWords(tm.STOPWORDS.EN);
-  
+        .removeWords(tm.STOPWORDS.EN)
+        .clean();
+
     var wordArrays = corpus.documents.map(function(x){ return x.split(" ")});
     console.log(wordArrays)
     /*
@@ -60,7 +61,7 @@ module.exports = function getCorpusSynsets(docs){
         }
       }, []);
     });
-
+    console.log(wordArrays)
     var res = wordArrays.map(function(arr){
       return createDocTree(arr);
     });
