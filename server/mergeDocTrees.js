@@ -4,10 +4,10 @@ module.exports = function mergeDocTrees(docArr){
     for (var key in d){
       d[key].count = 1;
     }
-  })
+  });
 
   var masterTree = docArr.shift();
-    console.log(masterTree)
+    //console.log(masterTree)
   docArr.forEach(function(d){
     for (var key in d){
       var currentSynset = masterTree[key];
@@ -20,4 +20,4 @@ module.exports = function mergeDocTrees(docArr){
     }
   });
  return masterTree;
-}
+};

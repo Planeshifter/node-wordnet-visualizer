@@ -11,10 +11,10 @@ module.exports = function propagateWords(tree){
       });
     }
   }
-  for (var key in tree){
-    var node = tree[key];
-    if (node.words) node.words = _.countBy(node.words);
-    console.log(node.words)
+  for (var key2 in tree){
+    var node2 = tree[key2];
+    if (node2.words) node2.words = _.countBy(node2.words);
+    //console.log(node2.words)
   }
   return tree;
-}
+};

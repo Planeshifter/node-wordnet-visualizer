@@ -70,7 +70,7 @@ function formD3Tree(tree){
 	}
   }
   walkTree(tree["root"], null);
-  removeFlaggedNodes(tree["root"]);
+    removeFlaggedNodes(tree["root"]);
   return tree["root"];
 }
 

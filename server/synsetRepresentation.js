@@ -4,6 +4,7 @@ var Promise = require("bluebird");
 var _ = require("underscore");
 var util = require("util");
 var memoize = require("./memoize.js");
+var logger = require("./logger.js");
 
 /*
 This function takes a corpus of documents and transforms it to an array of promises containing wordNet synset objects.
@@ -35,8 +36,7 @@ module.exports = function getCorpusSynsets(docs){
         .removeWords(tm.STOPWORDS.EN)
         .clean();
 
-    var wordArrays = corpus.documents.map(function(x){ return x.split(" ")});
-    console.log(wordArrays)
+    var wordArrays = corpus.documents.map(function(x){ return x.split(" "); });
     /*
     takes word arrays and maps them to arrays objects containing unique words plus counter, e.g.
     [ [ 'happy' ], [ 'oranges', 'lemons', 'and', 'oranges' ] ]
@@ -49,10 +49,10 @@ module.exports = function getCorpusSynsets(docs){
     */
     wordArrays = wordArrays.map(function(arr){
       return arr.reduce(function(a,b){
-        var existingWord = a.filter(function(x){ return x.string === b});
+        var existingWord = a.filter(function(x){ return x.string === b; });
         if(existingWord.length > 0){
           existingWord[0].count++;
-          return a
+          return a;
         } else {
           var word = {};
           word.string = b;
@@ -61,13 +61,12 @@ module.exports = function getCorpusSynsets(docs){
         }
       }, []);
     });
-    console.log(wordArrays)
     var res = wordArrays.map(function(arr){
       return createDocTree(arr);
     });
     return Promise.all(res);
 
-  } /* end definition getCorpusSynsets */
+  }; /* end definition getCorpusSynsets */
 
 
   // Helper Functions
@@ -117,4 +116,3 @@ module.exports = function getCorpusSynsets(docs){
     });
     return Promise.all(ret);
   });
-

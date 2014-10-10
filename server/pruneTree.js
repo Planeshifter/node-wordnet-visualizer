@@ -10,13 +10,13 @@ module.exports = function pruneTree(tree, treshold){
   				parent.words = parent.words ? parent.words = parent.words.concat(node.words) : parent.words = node.words;
   			}
   			if (parent && parent.count < treshold) propagateWord(parent);
-  		} 
+  		}
   		if (node.count < treshold) propagateWord(node);
   	}
   }
   for (var keys in tree){
     var node = tree[keys];
-    if (node.count < treshold) delete tree[keys]; 
+    if (node.count < treshold) delete tree[keys];
   }
   return tree;
-}
+};

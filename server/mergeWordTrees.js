@@ -14,4 +14,4 @@ module.exports = function mergeWordTrees(wordArr){
     }
   });
  return masterTree;
-}
+};

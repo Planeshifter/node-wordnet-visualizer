@@ -1,4 +1,4 @@
-var Promise = require("bluebird");
+var BPromise = require("bluebird");
 var _ = require("underscore");
 var util = require("util");
 var memoize = require("./memoize.js");
@@ -10,12 +10,12 @@ module.exports = function constructSynsetData(word){
   var wordTree = {};
 
   if (synsetArr === null){
-  	return wordTree
+  	return wordTree;
   }
 
   synsetArr.forEach(function(bs){
   	bs.word = Array(word.string);
-  })
+  });
 
   synsetArr.forEach(function(bs){
   	bs.ancestors = [];
@@ -24,14 +24,14 @@ module.exports = function constructSynsetData(word){
       wordTree[synset.synsetid] = new SynsetNode(synset, word);
       if (synset.hypernym && synset.hypernym[0]){
         createAncestorArr(synset.hypernym[0]);
-        bs.ancestors.push(synset.hypernym[0].synsetid)
+        bs.ancestors.push(synset.hypernym[0].synsetid);
         // synset.hypernym = null;
       }
     }
     createAncestorArr(bs);
   });
   return wordTree;
-}
+};
 
 function SynsetNode(synset, word){
     if(synset.hypernym && synset.hypernym.length > 0){

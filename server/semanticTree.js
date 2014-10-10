@@ -24,17 +24,17 @@ module.exports = function constructSynsetData(word){
 
     createAncestorArr(bs, []);
     return ret;
-  })
+  });
 
   word.tree = createTree(ancestorsArrays);
   return word;
-}
+};
 
 function createTree(ancestorsArrays){
   var tree = new Tree();
   for (var i = 0; i < ancestorsArrays.length; i++){
     var currentArr = ancestorsArrays[i];
-    console.log(currentArr)
+    // console.log(currentArr)
     var n = currentArr.length;
     while (n--){
       var parent = currentArr[n+1];
@@ -91,9 +91,9 @@ function Tree(){
     function mergeChildren(node){
       var childs = node.children;
       childs.forEach(function(elem){
-        var target = self.jumpTo(node); 
+        var target = self.jumpTo(node);
         if (target.selectChildrenByKey("synsetid", elem.data.synsetid)) {
-          
+
         }
         else {
           target.appendChildNode(elem);
